@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem \"c:\\\\_Programming\\\\git\\\\NSdigital projects\\\\Site-crafter\\\\public\\\\grand\")",
+      "Bash(Select-Object Name)",
+      "PowerShell(Get-ChildItem \"c:\\\\_Programming\\\\git\\\\NSdigital projects\\\\Site-crafter\\\\public\\\\grand\" -Force | ForEach-Object { $_.Name })"
+    ]
+  }
+}
