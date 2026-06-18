@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Search, SlidersHorizontal, Star, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -195,9 +195,6 @@ export default function ProductShop({ id, title, subtitle, topWaveType, bottomWa
   const showFilters = shopConfig?.showFilters !== false;
   const categoryOrder = shopConfig?.categoryOrder ?? [];
 
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const didMountRef = useRef(false);
-
   const [activeTab, setActiveTab] = useState('all');
   const [search, setSearch] = useState('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
@@ -311,14 +308,6 @@ export default function ProductShop({ id, title, subtitle, topWaveType, bottomWa
     [mainProducts, safePage]
   );
 
-  useEffect(() => {
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-      return;
-    }
-    sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [safePage]);
-
   const handleReset = () => {
     setPriceRange([minPrice, maxPrice]);
     setFilterCategories([]);
@@ -334,7 +323,7 @@ export default function ProductShop({ id, title, subtitle, topWaveType, bottomWa
   return (
     <>
     <SeperatorWave type={topWaveType} flip={false} color={'var(--bg)'} />
-    <section ref={sectionRef} id={id} className="section">
+    <section id={id} className="section">
       <div className="mx-auto max-w-7xl px-4">
         {/* Header */}
         {(title || subtitle) && (

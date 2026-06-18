@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { SiteConfig, AnySection, HeaderSection, FooterSection } from '@/types/site';
+import { WAVE_TYPES, type SiteConfig, type AnySection, type HeaderSection, type FooterSection } from '@/types/site';
 import { useSite } from '@/context/SiteContext';
 import { getSiteId } from '@/lib/siteId';
 import MediaPicker from './MediaPicker';
@@ -12,6 +12,7 @@ import { faChevronUp, faChevronDown, faTrash } from '@fortawesome/free-solid-svg
 import AdminAIChatPanel from './AdminAIChatPanel';
 import { applySiteConfigPatch } from '@/lib/siteConfigPatch';
 import { getAdminSectionSlots, getAdminPageSectionSlots, normalizeSiteConfig } from '@/lib/siteConfigSections';
+import { isAdminAiUiEnabled } from '@/lib/adminAi';
 import type { SitePage } from '@/types/site';
 
 // -----------------------------
@@ -46,6 +47,7 @@ export default function ConfigModal({
   externalPatchPreview = false,
 }: ConfigModalProps) {
   const { config, setConfig } = useSite();
+  const adminAiEnabled = isAdminAiUiEnabled();
   const siteId = getSiteId();
 
   // Working copy (nullable until config is ready)
@@ -459,6 +461,49 @@ export default function ConfigModal({
             </label>
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium">Top wave</label>
+              <select
+                className="select w-full"
+                value={section.topWaveType ?? ''}
+                onChange={(e) =>
+                  onChange({
+                    ...section,
+                    topWaveType: (e.target.value || undefined) as AnySection['topWaveType'],
+                  })
+                }
+              >
+                <option value="">— none —</option>
+                {WAVE_TYPES.map((waveType) => (
+                  <option key={waveType} value={waveType}>
+                    {waveType}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium">Bottom wave</label>
+              <select
+                className="select w-full"
+                value={section.bottomWaveType ?? ''}
+                onChange={(e) =>
+                  onChange({
+                    ...section,
+                    bottomWaveType: (e.target.value || undefined) as AnySection['bottomWaveType'],
+                  })
+                }
+              >
+                <option value="">— none —</option>
+                {WAVE_TYPES.map((waveType) => (
+                  <option key={waveType} value={waveType}>
+                    {waveType}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           {/* Type-specific */}
           {Editor ? (
             <Editor
@@ -561,18 +606,20 @@ export default function ConfigModal({
             </button>
           </div>
         </div>
-        <div className="p-4 border-b">
-          <AdminAIChatPanel
-            mode="inline"
-            title="AI (Edit Sections)"
-            placeholder="Ask AI to update sections, content, or theme..."
-            config={draft}
-            onApplyPatch={(patch) => {
-              pendingAutoPreviewRef.current = true;
-              setDraft((prev) => (prev ? applySiteConfigPatch(prev, patch) : prev));
-            }}
-          />
-        </div>
+        {adminAiEnabled && (
+          <div className="p-4 border-b">
+            <AdminAIChatPanel
+              mode="inline"
+              title="AI (Edit Sections)"
+              placeholder="Ask AI to update sections, content, or theme..."
+              config={draft}
+              onApplyPatch={(patch) => {
+                pendingAutoPreviewRef.current = true;
+                setDraft((prev) => (prev ? applySiteConfigPatch(prev, patch) : prev));
+              }}
+            />
+          </div>
+        )}
 
         {/* Body */}
         <div className="grid md:grid-cols-3 gap-0">
